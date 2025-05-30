@@ -73,10 +73,12 @@ you call func: `scheduler.Start()` to trigger scheduler.
 >> `bigGR` will receive `scheduler.startCh` and call `scheduler.selectStart()` that will push to `scheduler.startedCh`  
 
 func `scheduler.selectStart()`
-> start a goroutine(I call it `execGR`) to run `scheduler.exec.start()` 
+> start a goroutine(I call it `execGR`) to run `scheduler.exec.start()`   
 > loop all jobs in `scheduler.jobs` map    
->> trigger the first run of job  
->> push to `scheduler.exec.jobsIn`: `execGR` will receive from.  
+>> trigger the first run of job   
+>> if start immediately, then push to `scheduler.exec.jobsIn`,`execGR` will receive from.  
+>> else compute next run time, then trigger after that time, push to `scheduler.exec.jobsIn`  
+>
 > push to `scheduler.startedCh`
 
 goroutine `execGR`
