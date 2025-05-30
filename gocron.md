@@ -30,6 +30,7 @@ interface: `JobDefinition`
 implement struct: 
 - `dailyJobDefinition`
 - `weeklyJobDefinition`
+- `cronJobDefinition`
 - ...
 
 type alias: `Task`: `type Task func() task`
@@ -47,7 +48,7 @@ implement struct: `job`
 `scheduler.NewJob` will register your `Task` and `JobDefinition` to scheduler as `Job`.
 
 > interface: `jobSchedule`  
-> implement struct: `internalJob`,`dailyJob`, `oneTimeJob`    
+> implement struct: `internalJob`,`dailyJob`, `oneTimeJob`, `cronJob`    
 >
 > init a `internalJob`   
 > verify task function and parameters.  
@@ -66,6 +67,23 @@ implement struct: `job`
 - func: `oneTimeJobDefinition.setup`
     > apply startAt option  
     > translate empty atTimes to `oneTimeJob`, and assign to field `jobSchedule` of `internalJob`  
+- func: `cronJobDefinition.setup`
+    > check cron is valid: return err if crontab can not match a valid future time( in 5 years)
+    > apply startAt option
+    > translate to `cronJob`, and assign to field `jobSchedule` of `internalJob`
+
+type `defaultCron`
+> field: `cronSchedule`, a cron next computer   
+> interface `cron.Schedule`  
+> 
+> ```
+> type Schedule interface {
+> 	// Next returns the next activation time, later than the given time.
+> 	// Next is invoked initially, and then each time the job is run.
+> 	Next(time.Time) time.Time
+> }
+> ```
+> implement struct: `SpecSchedule`  
 
 ### trigger scheduler
 you call func: `scheduler.Start()` to trigger scheduler.
